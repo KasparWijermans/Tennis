@@ -2,7 +2,7 @@ import random
 import configparser
 config = configparser.ConfigParser()
 config.read('Settings.ini')
-
+#hoi
 servicewinrate = float(config['TENNIS']['ServiceWinrate'])
 
 
