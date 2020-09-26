@@ -57,6 +57,32 @@ class game:
         else:
             return False
 
+class set:
+    def __init__(self, player1, player2):
+        self.players = (player1, player2)
+        self.game = []
+        self.score = [0, 0]
+        self.winner = self.playSet()
+    
+    def playSet(self):
+        while not self.isDecided():
+            self.game.append(game(self.players[len(self.game) % 2], self.players[(len(self.game) + 1) % 2 ]))
+            if self.game[-1].winner == self.players[0]:
+                self.score[0] = self.score[0] + 1 
+            else:
+                self.score[1] = self.score[1] + 1
+            print("Setscore:")
+            print(self.score)
+        return self.game[-1].winner
 
 
-print(game(Federer,Nadal).winner.name)
+    def isDecided(self):
+        if self.score[0] > 5 and self.score[0] > self.score[1]+1:
+            return True
+        elif self.score[1] > 5 and self.score[1] > self.score[0]+1:
+            return True
+        else:
+            return False
+
+
+print(set(Federer,Nadal).winner.name)
