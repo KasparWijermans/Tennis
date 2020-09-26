@@ -14,11 +14,6 @@ class Speler:
         self.service = int(service)
         self.stamina = int(stamina)
 
-
-Nadal = Speler("Rafael", 10, 7, 8, 9)
-Federer = Speler("Roger", 8, 9, 9, 8)
-
-
 class rally: 
     def __init__(self, server, receiver):
         #self.server = server
@@ -115,7 +110,18 @@ class match:
         else:
             return False       
 
+class tiebreak:
+    def __init__(self, player1, player2, match):
+        self.players = (player1,player2)
+        self.match = match
+        self.score = [0,0]
+        self.winner = self.playTiebreak()
+    
+    def playTiebreak(self):
+        return self.players[0]
 
 
+Nadal = Speler("Rafael", 10, 7, 8, 9)
+Federer = Speler("Roger", 8, 9, 9, 8)
 
 match(Federer,Nadal, 3, bool(1))
