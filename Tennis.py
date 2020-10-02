@@ -2,7 +2,6 @@ import random
 import configparser
 config = configparser.ConfigParser()
 config.read('Settings.ini')
-#ja doeiiii
 servicewinrate = float(config['TENNIS']['ServiceWinrate'])
 
 
@@ -16,15 +15,10 @@ class Speler:
 
 class rally: 
     def __init__(self, server, receiver):
-        #self.server = server
-        #self.receiver = receiver
         if ((0.03*(server.service - (receiver.forehand + receiver.backhand)/2)) + servicewinrate) > random.random():
             self.winner = server
         else:
             self.winner = receiver
-        
-#exhaustion = stamina - rally_num  
-
 
 class game:
     def __init__(self, server, receiver):
@@ -34,7 +28,7 @@ class game:
         self.score =[0,0]                   
         self.winner = self.playGame()
         print("Game " + self.winner.name)
-
+    
     def playGame(self):
         while  not self.isDecided():
             self.rally.append(rally(self.server, self.receiver))
@@ -44,7 +38,7 @@ class game:
                 self.score[1] = self.score[1] + 1
         print(self.score)
         return self.rally[-1].winner
-
+    
     def isDecided(self):
         if self.score[0] > 3 and self.score[0] > self.score[1]+1:
             return True
@@ -66,16 +60,23 @@ class set:
         while not self.isDecided():
             self.game.append(game(self.players[self.match.gamenumber % 2], self.players[(self.match.gamenumber + 1) % 2 ]))
             self.match.gamenumber += 1
-            if self.game[-1].winner == self.players[0]:
-                self.score[0] = self.score[0] + 1 
-            else:
-                self.score[1] = self.score[1] + 1
-            print("Setscore:" + str(self.score))
+            self.scoring()
         return self.game[-1].winner
 
-
+    def scoring(self):
+        if self.game[-1].winner == self.players[0]:
+            self.score[0] = self.score[0] + 1 
+        else:
+            self.score[1] = self.score[1] + 1
+        print("Setscore:" + str(self.score))
+    
     def isDecided(self):
-        if self.score[0] > 5 and self.score[0] > self.score[1]+1:
+        if self.score == [6, 6]:
+            print("Tiebreaker:")
+            self.game.append(tiebreak(self.players[self.match.gamenumber % 2], self.players[(self.match.gamenumber + 1) % 2 ], self.match))
+            self.scoring()
+            return True
+        elif self.score[0] > 5 and self.score[0] > self.score[1]+1:
             return True
         elif self.score[1] > 5 and self.score[1] > self.score[0]+1:
             return True
@@ -91,7 +92,7 @@ class match:
         self.setsToWin = setsToWin
         self.winner = self.playMatch()
         print("match: " + self.winner.name)
-
+    
     def playMatch(self):
         while not self.isDecided():
             self.set.append(set(self.players[0], self.players[1], self))
@@ -101,7 +102,7 @@ class match:
                 self.score[1] = self.score[1] + 1
             print("Match score: "+ str(self.score))
         return self.set[-1].winner
-
+    
     def isDecided(self):
         if self.score[0] == self.setsToWin:
             return True
@@ -112,13 +113,34 @@ class match:
 
 class tiebreak:
     def __init__(self, player1, player2, match):
-        self.players = (player1,player2)
+        self.players = (player1, player1, player2, player2)
+        self.rallynr = 1
         self.match = match
         self.score = [0,0]
+        self.rally = []
         self.winner = self.playTiebreak()
     
     def playTiebreak(self):
-        return self.players[0]
+        while not self.isDecided():
+            self.rally.append(rally(self.players[self.rallynr % 4], self.players[(self.rallynr + 1) % 4 ]))
+            self.match.gamenumber += (self.rallynr % 2)
+            self.rallynr += 1
+            if self.rally[-1].winner == self.players[0]:
+                self.score[0] = self.score[0] + 1 
+            else:
+                self.score[1] = self.score[1] + 1
+            print(self.score)
+        return self.rally[-1].winner
+        # winner == winner set
+    
+    def isDecided(self):
+        if self.score[0] > 6 and self.score[0] > self.score[1]+1:
+            return True
+        elif self.score[1] > 6 and self.score[1] > self.score[0]+1:
+            return True
+        else:
+            return False
+
 
 
 Nadal = Speler("Rafael", 10, 7, 8, 9)
