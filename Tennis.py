@@ -3,6 +3,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('Settings.ini')
 servicewinrate = float(config['TENNIS']['ServiceWinrate'])
+staminarange = (float(config['STAMINA']['set1']), float(config['STAMINA']['set2']), float(config['STAMINA']['set3']), float(config['STAMINA']['set4']), float(config['STAMINA']['set5']))
 
 
 class Speler:
@@ -12,26 +13,30 @@ class Speler:
         self.backhand = int(backhand)
         self.service = int(service)
         self.stamina = int(stamina)
+        
 
 class rally: 
-    def __init__(self, server, receiver):
-        if ((0.03*(server.service - (receiver.forehand + receiver.backhand)/2)) + servicewinrate) > random.random():
+    def __init__(self, server, receiver, match):
+        fitness = staminarange[(len(match.set))]
+        if ((0.03 * ((server.service *  (1-fitness) + server.stamina * fitness) - ((receiver.forehand + receiver.backhand)*(1-fitness)/2 + receiver.stamina * fitness))) + servicewinrate) > random.random():
             self.winner = server
         else:
             self.winner = receiver
 
 class game:
-    def __init__(self, server, receiver):
+    def __init__(self, server, receiver, match):
         self.server = server
         self.receiver = receiver
+        self.match = match
         self.rally = []
         self.score =[0,0]                   
         self.winner = self.playGame()
+        self.match = match
         print("Game " + self.winner.name)
     
     def playGame(self):
         while  not self.isDecided():
-            self.rally.append(rally(self.server, self.receiver))
+            self.rally.append(rally(self.server, self.receiver, self.match))
             if self.rally[-1].winner == self.server:
                 self.score[0] = self.score[0] + 1 
             else:
@@ -58,7 +63,7 @@ class set:
     
     def playSet(self):
         while not self.isDecided():
-            self.game.append(game(self.players[self.match.gamenumber % 2], self.players[(self.match.gamenumber + 1) % 2 ]))
+            self.game.append(game(self.players[self.match.gamenumber % 2], self.players[(self.match.gamenumber + 1) % 2 ], self.match))
             self.match.gamenumber += 1
             self.scoring()
         return self.game[-1].winner
@@ -122,7 +127,7 @@ class tiebreak:
     
     def playTiebreak(self):
         while not self.isDecided():
-            self.rally.append(rally(self.players[self.rallynr % 4], self.players[(self.rallynr + 1) % 4 ]))
+            self.rally.append(rally(self.players[self.rallynr % 4], self.players[(self.rallynr + 1) % 4 ], self.match))
             self.match.gamenumber += (self.rallynr % 2)
             self.rallynr += 1
             if self.rally[-1].winner == self.players[0]:
