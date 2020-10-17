@@ -18,7 +18,10 @@ class Speler:
 class rally: 
     def __init__(self, server, receiver, match):
         fitness = staminarange[(len(match.set))]
-        if ((0.03 * ((server.service *  (1-fitness) + server.stamina * fitness) - ((receiver.forehand + receiver.backhand)*(1-fitness)/2 + receiver.stamina * fitness))) + servicewinrate) > random.random():
+        serviceskill = server.service * (1-((1-(0.1 * server.stamina))* fitness))
+        backhandskill = receiver.backhand * (1-((1-(0.1 * receiver.stamina))* fitness))
+        forehandskill = receiver.forehand * (1-((1-(0.1 * receiver.stamina))* fitness))
+        if ((0.03 * ((serviceskill) - ((forehandskill + backhandskill)/2))) + servicewinrate) > random.random():
             self.winner = server
         else:
             self.winner = receiver
