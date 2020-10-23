@@ -4,7 +4,7 @@ config = configparser.ConfigParser()
 config.read('Settings.ini')
 servicewinrate = float(config['TENNIS']['ServiceWinrate'])
 staminarange = (float(config['STAMINA']['set1']), float(config['STAMINA']['set2']), float(config['STAMINA']['set3']), float(config['STAMINA']['set4']), float(config['STAMINA']['set5']))
-
+TiebreakRule = int(config['TENNIS']['TieBreakFinalSet'])
 
 class Speler:
     def __init__ (self, name, forehand, backhand, service, stamina):
@@ -35,7 +35,7 @@ class game:
         self.score =[0,0]                   
         self.winner = self.playGame()
         self.match = match
-        print("Game " + self.winner.name)
+        #print("Game " + self.winner.name)
     
     def playGame(self):
         while  not self.isDecided():
@@ -44,7 +44,7 @@ class game:
                 self.score[0] = self.score[0] + 1 
             else:
                 self.score[1] = self.score[1] + 1
-        print(self.score)
+        #print(self.score)
         return self.rally[-1].winner
     
     def isDecided(self):
@@ -62,7 +62,7 @@ class set:
         self.game = []
         self.score = [0, 0]
         self.winner = self.playSet()
-        print("Set: " + self.winner.name)
+        #print("Set: " + self.winner.name)
     
     def playSet(self):
         while not self.isDecided():
@@ -79,11 +79,25 @@ class set:
         print("Setscore:" + str(self.score))
     
     def isDecided(self):
-        if self.score == [6, 6]:
-            print("Tiebreaker:")
-            self.game.append(tiebreak(self.players[self.match.gamenumber % 2], self.players[(self.match.gamenumber + 1) % 2 ], self.match))
+
+        if self.score == [12, 12] and TiebreakRule == 3:
+            self.game.append(tiebreak(self.players[self.match.gamenumber % 2], self.players[(self.match.gamenumber + 1) % 2],self.match))
             self.scoring()
             return True
+        if self.score == [6, 6]:
+            if len(self.match.set) == (self.match.setsToWin * 2 -1) and TiebreakRule != 1:
+                if TiebreakRule == 0 or TiebreakRule == 3:
+                    return False
+                else:
+                    self.game.append(tiebreak(self.players[self.match.gamenumber % 2], self.players[(self.match.gamenumber + 1) % 2],self.match))
+                    self.scoring()
+                    return True
+
+           # print("Tiebreaker:")
+            else:
+                self.game.append(tiebreak(self.players[self.match.gamenumber % 2], self.players[(self.match.gamenumber + 1) % 2 ], self.match))
+                self.scoring()
+                return True
         elif self.score[0] > 5 and self.score[0] > self.score[1]+1:
             return True
         elif self.score[1] > 5 and self.score[1] > self.score[0]+1:
@@ -98,6 +112,7 @@ class match:
         self.set = []
         self.score = [0,0]
         self.setsToWin = setsToWin
+        self.tiebreaker = tiebreaker
         self.winner = self.playMatch()
         print("match: " + self.winner.name)
     
@@ -108,7 +123,7 @@ class match:
                 self.score[0] = self.score[0] + 1 
             else:
                 self.score[1] = self.score[1] + 1
-            print("Match score: "+ str(self.score))
+            #print("Match score: "+ str(self.score))
         return self.set[-1].winner
     
     def isDecided(self):
@@ -137,7 +152,7 @@ class tiebreak:
                 self.score[0] = self.score[0] + 1 
             else:
                 self.score[1] = self.score[1] + 1
-            print(self.score)
+            #print(self.score)
         return self.rally[-1].winner
         # winner == winner set
     
@@ -149,9 +164,11 @@ class tiebreak:
         else:
             return False
 
+print(TiebreakRule)
+print(True and (TiebreakRule == 3))
 
 
-Nadal = Speler("Rafael", 10, 7, 8, 9)
-Federer = Speler("Roger", 8, 9, 9, 8)
+# Nadal = Speler("Rafael", 10, 7, 8, 9)
+# Federer = Speler("Roger", 8, 9, 9, 8)
 
-match(Federer,Nadal, 3, bool(1))
+# match(Federer,Nadal, 3, bool(1))
