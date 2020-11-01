@@ -18,9 +18,7 @@ while len(result) > 1:
     for i in range(int(len(result)/2)):
         print((result[2*i]).name + " versus " + (result[2*i+1]).name)
         temp.append(Tennis.match(result[2*i],result[2*i+1],3,True).winner)
-
     ronde+=1
-
     result = temp
 
 
