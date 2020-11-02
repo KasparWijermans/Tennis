@@ -82,7 +82,12 @@ class set:
             return self.tiebreakcall(6)
         elif self.score == [6, 6]:
             if len(self.match.set) == (self.match.setsToWin * 2 -2):
-                return [False, self.tiebreakcall(6), self.tiebreakcall(9), False][TiebreakRule]
+                if TiebreakRule % 3 == 0:
+                    return False
+                elif TiebreakRule == 1:
+                    return self.tiebreakcall(6)
+                elif TiebreakRule == 2:
+                    return self.tiebreakcall(9)
             else:
                 return self.tiebreakcall(6)
         elif self.score[0] > 5 and self.score[0] > self.score[1]+1:
@@ -99,13 +104,13 @@ class set:
         return True
 
 class match:
-    def __init__(self, player1, player2, setsToWin, tiebreaker):
+    def __init__(self, player1, player2, setsToWin, tiebreaker=TiebreakRule):
         self.gamenumber = random.randint(0, 1)
         self.players = (player1, player2)
         self.set = []
         self.score = [0,0]
         self.setsToWin = setsToWin
-        self.tiebreaker = tiebreaker
+        TiebreakRule = tiebreaker
         self.winner = self.playMatch()
         print("match: " + self.winner.name)
     

@@ -1,6 +1,7 @@
 import Tennis
 import csv
 
+
 spelers = []
 
 with open('Map1.csv') as csvfile:
@@ -17,7 +18,7 @@ while len(result) > 1:
     print("ronde: " + str(ronde))
     for i in range(int(len(result)/2)):
         print((result[2*i]).name + " versus " + (result[2*i+1]).name)
-        temp.append(Tennis.match(result[2*i],result[2*i+1],3,True).winner)
+        temp.append(Tennis.match(result[2*i],result[2*i+1],3).winner)
     ronde+=1
     result = temp
 
