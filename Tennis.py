@@ -5,6 +5,11 @@ config.read('Settings.ini')
 servicewinrate = float(config['TENNIS']['ServiceWinrate'])
 staminarange = (float(config['STAMINA']['set1']), float(config['STAMINA']['set2']), float(config['STAMINA']['set3']), float(config['STAMINA']['set4']), float(config['STAMINA']['set5']))
 TiebreakRule = int(config['TENNIS']['TieBreakFinalSet'])
+PointOutput = bool(int(config['OUTPUT']['Point']))
+GameOutput = bool(int(config['OUTPUT']['Game']))
+TiebreakOutput = bool(int(config['OUTPUT']['Tiebreak']))
+SetOutput = bool(int(config['OUTPUT']['Set']))
+MatchOutput = bool(int(config['OUTPUT']['Match']))
 
 class Speler:
     def __init__ (self, name, forehand, backhand, service, stamina):
@@ -33,8 +38,8 @@ class game:
         self.rally = []
         self.score =[0,0]                   
         self.winner = self.playGame()
-        self.match = match
-        #print("Game " + self.winner.name)
+        if GameOutput:
+            print("Game " + self.winner.name)
     
     def playGame(self):
         while  not self.isDecided():
@@ -43,7 +48,8 @@ class game:
                 self.score[0] = self.score[0] + 1 
             else:
                 self.score[1] = self.score[1] + 1
-        #print(self.score)
+            if GameOutput:
+                print(self.score)
         return self.rally[-1].winner
     
     def isDecided(self):
@@ -61,7 +67,8 @@ class set:
         self.game = []
         self.score = [0, 0]
         self.winner = self.playSet()
-        #print("Set: " + self.winner.name)
+        if SetOutput:
+            print("Set: " + self.winner.name)
     
     def playSet(self):
         while not self.isDecided():
@@ -75,7 +82,8 @@ class set:
             self.score[0] = self.score[0] + 1 
         else:
             self.score[1] = self.score[1] + 1
-        print("Setscore:" + str(self.score))
+        if SetOutput:
+            print("Setscore:" + str(self.score))
     
     def isDecided(self):
         if self.score == [12, 12] and TiebreakRule == 3 and len(self.match.set) == (self.match.setsToWin * 2 -2):
@@ -98,7 +106,8 @@ class set:
             return False
 
     def tiebreakcall(self, win):
-        print("Tiebreaker:")
+        if TiebreakOutput:
+            print("Tiebreaker:")
         self.game.append(tiebreak(self.players[self.match.gamenumber % 2], self.players[(self.match.gamenumber + 1) % 2],self.match, win))
         self.scoring()
         return True
@@ -112,7 +121,8 @@ class match:
         self.setsToWin = setsToWin
         TiebreakRule = tiebreaker
         self.winner = self.playMatch()
-        print("match: " + self.winner.name)
+        if MatchOutput:
+            print("match: " + self.winner.name)
     
     def playMatch(self):
         while not self.isDecided():
@@ -121,7 +131,8 @@ class match:
                 self.score[0] = self.score[0] + 1 
             else:
                 self.score[1] = self.score[1] + 1
-            print("Match score: "+ str(self.score))
+            if MatchOutput:
+                print("Match score: "+ str(self.score))
         return self.set[-1].winner
     
     def isDecided(self):
@@ -151,7 +162,8 @@ class tiebreak:
                 self.score[0] = self.score[0] + 1 
             else:
                 self.score[1] = self.score[1] + 1
-            print(self.score)
+            if TiebreakOutput:
+                print(self.score)
         return self.rally[-1].winner
         # winner == winner set
     
