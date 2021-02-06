@@ -1,16 +1,19 @@
+#%% Import statements
 from tkinter import *
 from tkinter import ttk
 import Tennis
 import toernooi
 import csv
 
-
+#%% Speler import
 AlleSpelers = []
 with open('Map1.csv') as csvfile:
     ReadCSV = csv.reader(csvfile, delimiter=';')
     for row in ReadCSV:
         AlleSpelers.append(Tennis.Speler(row[0],row[1],row[2],row[3],row[4]))
 
+
+#%% Create basic frame and tabs
 root = Tk()
 tabControl = ttk.Notebook(root)
 tab1 = ttk.Frame(tabControl)
@@ -26,9 +29,8 @@ tabControl.add(tabSettings, text = "Settings")
 tabControl.pack(expand=1, fill="both")
 root.geometry("800x600")
 
-
+#%% Spelers tabblad invullen
 '''spelers kiezen tabblad'''
-
 
 def activateSpeler():
     temp = spelerlijst.curselection()
@@ -83,6 +85,8 @@ sys.stdout.write = redirector #whenever sys.stdout.write is called, redirector i
 
 scroll_bar.config( command = ToernooiOutput.yview)
 
+
+#%%Settings tabblad logica
 '''Settings tabblad'''
 
 def updateSettings():
@@ -91,6 +95,7 @@ def updateSettings():
     Tennis.GameOutput = settingGameOutput.get()
     Tennis.SetOutput = settingSetOutput.get()
     Tennis.TiebreakOutput = settingTiebreakOutput.get()
+    Tennis.TiebreakRule = settingTiebreakRule.get()
     
 # point game set tiebreak match, score weergeven
 
@@ -105,7 +110,19 @@ Checkbutton(tabSettings, text="tiebreak", variable=settingTiebreakOutput, comman
 settingMatchOutput = IntVar(value=Tennis.MatchOutput)
 Checkbutton(tabSettings, text="match", variable=settingMatchOutput, command=updateSettings).grid(row=4, sticky=W)
 
+Label(tabSettings, text='grandslam regelset').grid(row=5)
+values = {"US Open" : "1", 
+          "Australian Open" : "2", 
+          "Wimbledon" : "3", 
+          "Roland Garros" : "0"} 
 
+settingTiebreakRule = IntVar(value=Tennis.TiebreakRule)
+
+for (text, value) in values.items(): 
+    Radiobutton(tabSettings, text = text, variable = settingTiebreakRule, 
+        value = value, command=updateSettings).grid() 
+
+#%% Actually run everything
 '''Run GUI'''
 root.title("Tennis")
 root.mainloop()
