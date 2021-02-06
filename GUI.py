@@ -17,12 +17,18 @@ tab1 = ttk.Frame(tabControl)
 tab2 = ttk.Frame(tabControl)
 tab3 = ttk.Frame(tabControl)
 tab4 = ttk.Frame(tabControl)
+tabSettings = ttk.Frame(tabControl)
 tabControl.add(tab1, text= "Speler toevoegen")
 tabControl.add(tab2, text= "Speler lijst")
 tabControl.add(tab3, text= "Speler wijzigen")
 tabControl.add(tab4, text= "Toernooi spelen")
+tabControl.add(tabSettings, text = "Settings")
 tabControl.pack(expand=1, fill="both")
 root.geometry("800x600")
+
+
+'''spelers kiezen tabblad'''
+
 
 def activateSpeler():
     temp = spelerlijst.curselection()
@@ -54,19 +60,53 @@ kiesspeler.pack()
 stopspeler = Button(tab2middleframe, command=deactivateSpeler, text="<<")
 stopspeler.pack()
 
-def openNewWindow(): 
-    newWindow = Toplevel(root) 
 
-    newWindow.title("New Window") 
+''' Toernooi spelen tabblad'''
 
-    newWindow.geometry("200x200") 
+def StartToernooi():
+    ToernooiOutput.delete('1.0', END)
+    toernooi.Toernooi()
 
-    Label(newWindow,  
-        text ="Kies je speler").pack() 
+button4 = Button(tab4, text = "Start toernooi", command= StartToernooi)
+button4.pack(padx = 50, pady = 20)
 
-button4 = Button(tab4, text = "Start toernooi", command= toernooi.Toernooi)
-button4.pack(padx = 50, pady = 50)
+scroll_bar = Scrollbar(tab4)
+scroll_bar.pack( side = RIGHT, 
+                fill = Y, padx=0 )
+ToernooiOutput = Text(tab4, yscrollcommand = scroll_bar.set)
+ToernooiOutput.pack(side = LEFT, padx = 20)
 
+def redirector(inputStr):
+    ToernooiOutput.insert(INSERT, inputStr)
+
+sys.stdout.write = redirector #whenever sys.stdout.write is called, redirector is called.
+
+scroll_bar.config( command = ToernooiOutput.yview)
+
+'''Settings tabblad'''
+
+def updateSettings():
+    Tennis.MatchOutput = settingMatchOutput.get()
+    Tennis.PointOutput = settingPointOutput.get()
+    Tennis.GameOutput = settingGameOutput.get()
+    Tennis.SetOutput = settingSetOutput.get()
+    Tennis.TiebreakOutput = settingTiebreakOutput.get()
+    
+# point game set tiebreak match, score weergeven
+
+settingPointOutput = IntVar(value=Tennis.PointOutput)
+Checkbutton(tabSettings, text="point", variable=settingPointOutput, command=updateSettings).grid(row=0, sticky=W)
+settingGameOutput = IntVar(value=Tennis.GameOutput)
+Checkbutton(tabSettings, text="game", variable=settingGameOutput, command=updateSettings).grid(row=1, sticky=W)
+settingSetOutput = IntVar(value=Tennis.SetOutput)
+Checkbutton(tabSettings, text="set", variable=settingSetOutput, command=updateSettings).grid(row=2, sticky=W)
+settingTiebreakOutput = IntVar(value=Tennis.TiebreakOutput)
+Checkbutton(tabSettings, text="tiebreak", variable=settingTiebreakOutput, command=updateSettings).grid(row=3, sticky=W)
+settingMatchOutput = IntVar(value=Tennis.MatchOutput)
+Checkbutton(tabSettings, text="match", variable=settingMatchOutput, command=updateSettings).grid(row=4, sticky=W)
+
+
+'''Run GUI'''
 root.title("Tennis")
 root.mainloop()
 
