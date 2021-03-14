@@ -63,6 +63,62 @@ stopspeler = Button(tab2middleframe, command=deactivateSpeler, text="<<")
 stopspeler.pack()
 
 
+''' Spelers wijzigen tabblad'''
+selected = AlleSpelers[0]
+def updateWijzigSpelersTab(var):
+    for speler in AlleSpelers:
+        if speler.name ==var:
+            selected = speler
+    FHfield.set(str(selected.forehand))
+    BHfield.set(str(selected.backhand))
+    SVfield.set(str(selected.service))
+    STfield.set(str(selected.stamina))
+
+
+
+
+OptionList = [
+
+] 
+
+for i in AlleSpelers:
+    OptionList.append(i.name)
+
+variable = StringVar()
+variable.set(OptionList[0])
+
+opt = OptionMenu(tab3, variable, *OptionList, command=updateWijzigSpelersTab)
+opt.config(width=90, font=('Times New Roman', 12))
+opt.pack()
+
+
+FHLabel = Label(tab3, text="Forehand")
+FHLabel.pack()
+FHfield = StringVar()
+FHfield.set(str(selected.forehand))
+FHText = Entry(tab3, textvariable=FHfield)
+FHText.pack()
+BHLabel = Label(tab3, text= "Backhandhand" ,)
+BHLabel.pack()
+BHfield = StringVar()
+BHfield.set(str(selected.backhand))
+BHText = Entry(tab3, textvariable=BHfield)
+BHText.pack()
+SLabel = Label(tab3, text= "Service" ,)
+SLabel.pack()
+SVfield = StringVar()
+SVfield.set(str(selected.service))
+SVText = Entry(tab3, textvariable=SVfield)
+SVText.pack()
+STLabel = Label(tab3, text= "Stamina" ,)
+STLabel.pack()
+STfield = StringVar()
+STfield.set(str(selected.stamina))
+STText = Entry(tab3, textvariable=STfield)
+STText.pack()
+
+
+
 ''' Toernooi spelen tabblad'''
 
 def StartToernooi():
