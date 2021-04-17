@@ -1,4 +1,5 @@
 #%% Import statements
+from os import name
 from tkinter import *
 from tkinter import ttk
 import Tennis
@@ -11,6 +12,8 @@ with open('Map1.csv') as csvfile:
     ReadCSV = csv.reader(csvfile, delimiter=';')
     for row in ReadCSV:
         AlleSpelers.append(Tennis.Speler(row[0],row[1],row[2],row[3],row[4]))
+
+ActiveSpelers = []
 
 
 #%% Create basic frame and tabs
@@ -33,16 +36,27 @@ root.geometry("800x600")
 '''spelers kiezen tabblad'''
 
 def activateSpeler():
+    def fun(i):
+        for speler in AlleSpelers:
+            if spelerlijst.get(i) == speler.name:
+                return speler
     temp = spelerlijst.curselection()
     for i in temp:
         selectedspelerslijst.insert(i, spelerlijst.get(i))
+        ActiveSpelers.append(fun(i))
     for i in temp:
         spelerlijst.delete(i)
+    
 
 def deactivateSpeler():
+    def fun(i):
+        for speler in AlleSpelers:
+            if spelerlijst.get(i) == speler.name:
+                return speler
     temp = selectedspelerslijst.curselection()
     for i in temp:
         spelerlijst.insert(i, selectedspelerslijst.get(i))
+        ActiveSpelers.remove(fun(i))
     for i in temp:
         selectedspelerslijst.delete(i)
 
@@ -67,13 +81,31 @@ stopspeler.pack()
 selected = AlleSpelers[0]
 def updateWijzigSpelersTab(var):
     for speler in AlleSpelers:
-        if speler.name ==var:
+        if speler.name == var:
             selected = speler
+            break
     FHfield.set(str(selected.forehand))
     BHfield.set(str(selected.backhand))
     SVfield.set(str(selected.service))
     STfield.set(str(selected.stamina))
 
+def savePlayerStats():
+    def fitNumber(number):
+        if number < 1:
+            return 1
+        elif number > 10:
+            return 10
+        else:
+            return number
+
+    for speler in AlleSpelers:
+        if speler.name == variable.get():
+            selected = speler
+            break
+    selected.forehand = fitNumber(int(FHfield.get()))
+    selected.backhand = fitNumber(int(BHfield.get()))
+    selected.service  = fitNumber(int(SVfield.get()))
+    selected.stamina  = fitNumber(int(STfield.get()))
 
 
 
@@ -117,13 +149,25 @@ STfield.set(str(selected.stamina))
 STText = Entry(tab3, textvariable=STfield)
 STText.pack()
 
+buttonSavePlayerChanges = Button(tab3, text = "Save", command= savePlayerStats)
+buttonSavePlayerChanges.pack(padx = 50, pady = 20)
+
 
 
 ''' Toernooi spelen tabblad'''
 
 def StartToernooi():
-    ToernooiOutput.delete('1.0', END)
-    toernooi.Toernooi()
+    p2 = [2]
+    while p2[-1]*2 <= len(AlleSpelers):
+        p2.append(p2[-1]*2)
+
+    if len(ActiveSpelers) in p2:
+        ToernooiOutput.delete('1.0', END)
+        toernooi.Toernooi(ActiveSpelers)
+    else:
+        ToernooiOutput.delete('1.0', END)
+        print("Selected players: " + str(len(ActiveSpelers)))
+        print("Number of selected players must be a power of two")
 
 button4 = Button(tab4, text = "Start toernooi", command= StartToernooi)
 button4.pack(padx = 50, pady = 20)
@@ -168,9 +212,9 @@ Checkbutton(tabSettings, text="match", variable=settingMatchOutput, command=upda
 
 Label(tabSettings, text='grandslam regelset').grid(row=5)
 values = {"US Open" : "1", 
-          "Australian Open" : "2", 
-          "Wimbledon" : "3", 
-          "Roland Garros" : "0"} 
+        "Australian Open" : "2", 
+        "Wimbledon" : "3", 
+        "Roland Garros" : "0"} 
 
 settingTiebreakRule = IntVar(value=Tennis.TiebreakRule)
 

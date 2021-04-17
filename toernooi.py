@@ -1,15 +1,7 @@
 import Tennis
 import csv
 
-def Toernooi():
-    spelers = []
-
-    with open('Map1.csv') as csvfile:
-        ReadCSV = csv.reader(csvfile, delimiter=';')
-        for row in ReadCSV:
-            spelers.append(Tennis.Speler(row[0],row[1],row[2],row[3],row[4]))
-
-
+def Toernooi(spelers):
     result = spelers
     ronde = 1
 
@@ -24,4 +16,10 @@ def Toernooi():
 
     print("The tournament winner is: " + result[0].name)
 
-#Toernooi()
+#Toernooi(
+#    spelers = []
+#    with open('Map1.csv') as csvfile:
+#        ReadCSV = csv.reader(csvfile, delimiter=';')
+#        for row in ReadCSV:
+#            spelers.append(Tennis.Speler(row[0],row[1],row[2],row[3],row[4]))
+#)
